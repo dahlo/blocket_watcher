@@ -5,7 +5,7 @@ import os
 import sys
 import json
 import urllib
-from IPython.core.debugger import Tracer
+# from IPython.core.debugger import Tracer
 from datetime import datetime
 import requests
 
@@ -57,12 +57,10 @@ There are {} new ad{} for the Blocket search '{}', {}
 
 """.format(title, price, link)
 
-
+	# add friendly signature
 	msg += "\nCheers\nThe Blocket Watcher"
 		
-		
-	# Tracer()()
-
+	# send the email
 	requests.post(
         "https://api.mailgun.net/v3/{}/messages".format(config.get('settings', 'mailgun_domain')),
         auth=("api", config.get('settings', 'mailgun_key')),
@@ -126,8 +124,6 @@ for ad in page.findAll('article', 'media'):
 
 		# the ad is new and should be reported to the user
 		new_ads.append(ad)
-
-	# Tracer()()
 
 
 
