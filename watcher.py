@@ -13,10 +13,9 @@ from email.mime.text import MIMEText
 from subprocess import Popen, PIPE
 
 
-try:
-    from bs4 import BeautifulSoup
-except ImportError:
-    from BeautifulSoup import BeautifulSoup
+
+from bs4 import BeautifulSoup
+
 
 
 
@@ -62,7 +61,7 @@ There are {} new ad{} for the Blocket search '{}', {}
 		
 	# send the email
 	emails = config.get('settings', 'email').split(",")
-	requests.post(
+	print requests.post(
         "https://api.mailgun.net/v3/{}/messages".format(config.get('settings', 'mailgun_domain')),
         auth=("api", config.get('settings', 'mailgun_key')),
         data={"from": "Blocket Watcher <blocket.watcher@{}>".format(config.get('settings', 'mailgun_domain')),
@@ -109,7 +108,11 @@ html = resp.read()
 page = BeautifulSoup(html, "lxml")
 
 # create date to compare to
-last_update = datetime.strptime(history[url]['date'], '%Y-%m-%d %H:%M:%S')
+try:
+	last_update = datetime.strptime(history[url]['date'], '%Y-%m-%d %H:%M:%S')
+except:
+	history[url] = {'date':'1970-01-01 00:00:00'}
+	last_update = datetime.strptime(history[url]['date'], '%Y-%m-%d %H:%M:%S')
 
 # init
 new_ads = []
