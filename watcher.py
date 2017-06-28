@@ -142,5 +142,5 @@ if new_ads:
 history[url]['date'] = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
 
 # save the history file again
-# with open("{}/history.json".format(workdir), "w") as history_file:
-# 	json.dump(history, history_file)
+with open("{}/history.json".format(workdir), "w") as history_file:
+	json.dump(history, history_file)
