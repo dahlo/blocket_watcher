@@ -80,19 +80,18 @@ There are {} new ad{} for the Blocket search '{}', {}
 workdir = os.path.dirname(os.path.realpath(__file__))
 
 
-
+# read the config file
 config = SafeConfigParser()
 config.read('{}/watcher.conf'.format(workdir))
 
 
 
 # get the url to watch
-usage = "python {} <url to watch>".format(sys.argv[0])
+usage = 'python {} "<url to watch>"'.format(sys.argv[0])
 try:
 	url = sys.argv[1]
 except:
-	url = "https://www.blocket.se/uppsala?q=yoyo+babyzen&cg=0&w=2&st=s&ca=10&is=1&l=0&md=th"
-	# sys.exit(usage)
+	sys.exit(usage)
 
 
 # try to open the history file
