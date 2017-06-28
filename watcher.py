@@ -61,7 +61,7 @@ There are {} new ad{} for the Blocket search '{}', {}
 		
 	# send the email
 	emails = config.get('settings', 'email').split(",")
-	print requests.post(
+	requests.post(
         "https://api.mailgun.net/v3/{}/messages".format(config.get('settings', 'mailgun_domain')),
         auth=("api", config.get('settings', 'mailgun_key')),
         data={"from": "Blocket Watcher <blocket.watcher@{}>".format(config.get('settings', 'mailgun_domain')),
