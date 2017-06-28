@@ -10,7 +10,9 @@ Rename watcher.conf.dist to watcher.conf and modify the file with your settings.
 # Usage
 Add one instance per url you want to watch to your crontab, maybe run it every 10 min or so. Try not to run multiple instances at the same time, as they will probably overwrite the `history.db` file and mess stuff up for each other.
 
-python blocket_watcher.py "\<url to watch\>"
+```bash
+python blocket_watcher.py "<url to watch>"
+```
 
 Ex.
 
