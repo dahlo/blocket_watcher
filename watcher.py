@@ -61,11 +61,12 @@ There are {} new ad{} for the Blocket search '{}', {}
 	msg += "\nCheers\nThe Blocket Watcher"
 		
 	# send the email
+	emails = config.get('settings', 'email').split(",")
 	requests.post(
         "https://api.mailgun.net/v3/{}/messages".format(config.get('settings', 'mailgun_domain')),
         auth=("api", config.get('settings', 'mailgun_key')),
         data={"from": "Blocket Watcher <blocket.watcher@{}>".format(config.get('settings', 'mailgun_domain')),
-              "to": [config.get('settings', 'email')],
+              "to": emails,
               "subject": "Blocket Watcher: {} new ad{} for '{}'".format(len(new_ads), multiple, search_string),
               "text": msg})
 
