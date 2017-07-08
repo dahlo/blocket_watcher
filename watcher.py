@@ -5,8 +5,9 @@ import os
 import sys
 import json
 import urllib
-# from IPython.core.debugger import Tracer
+from IPython.core.debugger import Tracer
 from datetime import datetime
+from dateutil.relativedelta import relativedelta
 import requests
 
 from email.mime.text import MIMEText
@@ -98,7 +99,7 @@ try:
 		history = json.load(history_file)
 except:
 	print("Failed to open history file {}, creating a new one.".format("history.json"))
-	history = {url:{'date':'1970-01-01 00:00:00'}}
+	history = {url:{'ads':[]}}
 
 
 
@@ -109,25 +110,31 @@ page = BeautifulSoup(html, "lxml")
 
 # create date to compare to
 try:
-	last_update = datetime.strptime(history[url]['date'], '%Y-%m-%d %H:%M:%S')
+	historic_ads = history[url]['ads']
 except:
-	history[url] = {'date':'1970-01-01 00:00:00'}
-	last_update = datetime.strptime(history[url]['date'], '%Y-%m-%d %H:%M:%S')
+	history[url] = {'ads':[]}
+	historic_ads = history[url]['ads']
 
 # init
 new_ads = []
+current_ads = []
 
 # find all ads
 for ad in page.findAll('article', 'media'):
 
-	# get ad date
-	ad_date = datetime.strptime(ad.div.header.time['datetime'], '%Y-%m-%d %H:%M:%S')
+	# Tracer()()
 
-	# check if it's a new ad
-	if ad_date > last_update:
+	# save the id as seen
+	current_ads.append(ad['id'])
 
-		# the ad is new and should be reported to the user
-		new_ads.append(ad)
+	# check if the url has been seen before
+	if ad['id'] not in historic_ads:
+
+		# check if the ad is old enough, and not just an old ad that was on page 2 of the results, but reached page 1 because a newer ad was removed
+		if datetime.strptime(ad.div.header.time['datetime'], '%Y-%m-%d %H:%M:%S') > (datetime.now() - relativedelta(hours=24)):
+
+			# save the ad as a new ad
+			new_ads.append(ad)
 
 
 
@@ -138,7 +145,7 @@ if new_ads:
 
 
 # update the history
-history[url]['date'] = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+history[url]['ads'] = current_ads
 
 # save the history file again
 with open("{}/history.json".format(workdir), "w") as history_file:
