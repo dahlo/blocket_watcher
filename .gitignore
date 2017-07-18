@@ -1,5 +1,5 @@
-history.json
-watcher.conf
+history.*
+*.conf
 
 
 

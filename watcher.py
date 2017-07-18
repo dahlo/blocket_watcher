@@ -5,7 +5,7 @@ import os
 import sys
 import json
 import urllib
-from IPython.core.debugger import Tracer
+# from IPython.core.debugger import Tracer
 from datetime import datetime
 from dateutil.relativedelta import relativedelta
 import requests
@@ -22,6 +22,8 @@ from bs4 import BeautifulSoup
 
 
 def alert_user(new_ads, config, url):
+
+	# print "alert"
 
 	# pluralize
 	multiple = ""
@@ -59,6 +61,7 @@ There are {} new ad{} for the Blocket search '{}', {}
 
 	# add friendly signature
 	msg += "\nCheers\nThe Blocket Watcher"
+	subject = "Blocket Watcher: {} new ad{} for '{}'".format(len(new_ads), multiple, search_string)
 		
 	# send the email
 	emails = config.get('settings', 'email').split(",")
@@ -67,8 +70,20 @@ There are {} new ad{} for the Blocket search '{}', {}
         auth=("api", config.get('settings', 'mailgun_key')),
         data={"from": "Blocket Watcher <blocket.watcher@{}>".format(config.get('settings', 'mailgun_domain')),
               "to": emails,
-              "subject": "Blocket Watcher: {} new ad{} for '{}'".format(len(new_ads), multiple, search_string),
+              "subject": subject,
               "text": msg})
+
+
+
+	# if there is a pushbullet api key given
+	if config.get("settings", "pushbullet_key"):
+
+		# send a pushbullet
+		from pushbullet import Pushbullet
+		pb = Pushbullet(config.get("settings", "pushbullet_key"))
+		pb.push_note(subject, msg)
+
+
 
 
 
@@ -79,23 +94,24 @@ There are {} new ad{} for the Blocket search '{}', {}
 workdir = os.path.dirname(os.path.realpath(__file__))
 
 
-# read the config file
-config = SafeConfigParser()
-config.read('{}/watcher.conf'.format(workdir))
-
-
-
 # get the url to watch
-usage = 'python {} "<url to watch>"'.format(sys.argv[0])
+usage = 'python {} <config file> "<url to watch>"'.format(sys.argv[0])
 try:
-	url = sys.argv[1]
+	config_file = sys.argv[1]
+	url = sys.argv[2]
 except:
 	sys.exit(usage)
 
 
+# read the config file
+config = SafeConfigParser()
+config.read('{}/{}'.format(workdir, config_file))
+
+# Tracer()()
+
 # try to open the history file
 try:
-	with open("{}/history.json".format(workdir), 'r') as history_file:
+	with open("{}/history.{}.json".format(workdir, ".".join(config_file.split('.')[:-1])), 'r') as history_file:
 		history = json.load(history_file)
 except:
 	print("Failed to open history file {}, creating a new one.".format("history.json"))
@@ -137,7 +153,7 @@ for ad in page.findAll('article', 'media'):
 			new_ads.append(ad)
 
 
-
+# Tracer()()
 # if there are any new ads to report
 if new_ads:
 	alert_user(new_ads, config, url)
@@ -148,5 +164,5 @@ if new_ads:
 history[url]['ads'] = current_ads
 
 # save the history file again
-with open("{}/history.json".format(workdir), "w") as history_file:
+with open("{}/history.{}.json".format(workdir, ".".join(config_file.split('.')[:-1])), "w") as history_file:
 	json.dump(history, history_file)

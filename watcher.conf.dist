@@ -2,3 +2,4 @@
 email=user@example.com,user2@example.com
 mailgun_key=key-7cab9ad3389d12a22e421618d92a80
 mailgun_domain=example2.se
+pushbullet_key=o.nMawY83NZ2RdjFDhfdU2NGzA9G8n3tTW or empty
